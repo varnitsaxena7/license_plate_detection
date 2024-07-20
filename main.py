@@ -8,19 +8,19 @@ import base64
 import requests
 from streamlit_lottie import st_lottie
 from datetime import datetime
-import tempfile
-import os
 
+# Load the pre-trained EasyOCR reader
 reader = easyocr.Reader(lang_list=['en'])
 
-plate_cascade = cv2.CascadeClassifier('CAR_DATA.xml')
+# Load the Haarcascade XML file for car number plates
+plate_cascade = cv2.CascadeClassifier('cars.xml')
 
 def load_lottieurl(url):
     r = requests.get(url)
     if r.status_code != 200:
         return None
     return r.json()
-
+    
 def main():
     st.title("License Plate of Cars Recognition App")
     
@@ -31,28 +31,35 @@ def main():
     st.sidebar.markdown("<br>", unsafe_allow_html=True)
     st.sidebar.markdown("---")
     st.sidebar.markdown("<h3 style='color: green;'>Instructions</h3>", unsafe_allow_html=True)
-    st.sidebar.info("Select 'Detection' to upload an image. Select 'About' to learn more about the app.")
+    st.sidebar.info("Select 'Detection' to upload an image and detect license plates. Select 'About' to learn more about the app.")
     
     st.sidebar.markdown("---")
+    st.sidebar.markdown("<h3 style='color: green;'>Connect</h3>", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     
     left_column, right_column = st.columns([0.6, 0.4])
 
     if choice == "Detection":
         with left_column:
-                uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
-                if uploaded_file is not None:
-                    image = read_image(uploaded_file)
-                    st.image(image, caption="Uploaded Image", use_column_width=True)
+            st.markdown("<p style='color: red;'>*Kindly ensure that the image is clear and taken from the correct angles to facilitate accurate license plate detection and reliable results</p>", unsafe_allow_html=True)
 
-                    if st.button("Detect License Plates"):
-                        detected_plates = detect_license_plates(image)
-                        st.write("Detected Plates:")
-                        st.write(detected_plates)
-                        
-                        csv_data = save_to_csv(detected_plates)
-                        download_link = get_download_link(csv_data)
-                        st.markdown(download_link, unsafe_allow_html=True)
+            uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
+        if uploaded_file is not None:
+            image = read_image(uploaded_file)
+            st.image(image, caption="Uploaded Image", use_column_width=True)
+
+            if st.button("Detect License Plates"):
+                detected_plates = detect_license_plates(image)
+                st.write("Detected Plates:")
+                st.write(detected_plates)
+                
+                csv_data = save_to_csv(detected_plates)
+                download_link = get_download_link(csv_data)
+                st.markdown(download_link, unsafe_allow_html=True)
+
+        with right_column:
+            st_lottie(lottie_coding, height="20", key="coding")
 
     elif choice == "About":
         st.subheader("About the Detection App")
@@ -63,10 +70,10 @@ def main():
                 <li>Detect license plates in uploaded images.</li>
                 <li>Download the detected license plate numbers in CSV format.</li>
                 <li>Suitable for various Real life applications such as automatic registration in societies, malls, and other institutions.</li>
-                <li>Dynamic image enhancement options.</li>
-                <li>Multi-language support for license plate OCR.</li>
             </ul>
-            """, unsafe_allow_html=True)
+            <p style='color: #FFD700;'>How It Works:</p>
+            The app processes the uploaded image using the Haarcascade algorithm to detect potential regions of license plates. Once regions are identified, EasyOCR reads the text on the license plates, providing accurate results.
+            <br><br>
         st.markdown("<br><br>", unsafe_allow_html=True)
 
 def read_image(uploaded_file):
@@ -102,7 +109,6 @@ def get_download_link(data):
     b64 = base64.b64encode(data).decode()
     href = f'<a href="data:file/csv;base64,{b64}" download="detected_plates.csv"><button style="background-color: #4CAF50; border: none; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 20px; border-radius: 5px; cursor: pointer;">Download CSV</button></a>'
     return href
-
 
 if __name__ == "__main__":
     main()
