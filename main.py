@@ -34,8 +34,6 @@ def main():
     st.sidebar.info("Select 'Detection' to upload an image and detect license plates. Select 'About' to learn more about the app.")
     
     st.sidebar.markdown("---")
-    st.sidebar.markdown("<h3 style='color: green;'>Connect</h3>", unsafe_allow_html=True)
-    """, unsafe_allow_html=True)
     
     left_column, right_column = st.columns([0.6, 0.4])
 
@@ -63,18 +61,6 @@ def main():
 
     elif choice == "About":
         st.subheader("About the Detection App")
-        st.markdown("""
-            <p style='color: #FFD700;'>Key Features:</p>
-            <ul>
-                <li>Upload images in JPG, JPEG, or PNG format.</li>
-                <li>Detect license plates in uploaded images.</li>
-                <li>Download the detected license plate numbers in CSV format.</li>
-                <li>Suitable for various Real life applications such as automatic registration in societies, malls, and other institutions.</li>
-            </ul>
-            <p style='color: #FFD700;'>How It Works:</p>
-            The app processes the uploaded image using the Haarcascade algorithm to detect potential regions of license plates. Once regions are identified, EasyOCR reads the text on the license plates, providing accurate results.
-            <br><br>
-        st.markdown("<br><br>", unsafe_allow_html=True)
 
 def read_image(uploaded_file):
     image = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
